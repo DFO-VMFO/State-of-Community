@@ -1,0 +1,19 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+@layer base {
+  html { font-family: 'Instrument Sans Variable', system-ui, sans-serif; color: #17201E; background: #F1F3EF; }
+  h1,h2,h3 { font-family: 'Bricolage Grotesque Variable', system-ui, sans-serif; letter-spacing: -0.02em; }
+  :focus-visible { outline: 3px solid #F2B705; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+}
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors; }
+  .btn-primary { @apply btn bg-forest text-white hover:bg-forest-700; }
+  .btn-ghost { @apply btn border border-line bg-white text-ink hover:bg-forest-100; }
+  .input { @apply w-full rounded-md border border-line bg-white px-3 py-2 text-sm; }
+  .label { @apply mb-1 block text-sm font-medium text-ink; }
+  .panel { @apply rounded-lg border border-line bg-white; }
+}
+/* bark-cloth inspired weave used on the membership card */
+.weave { background-image:
+  repeating-linear-gradient(45deg, rgba(242,183,5,.16) 0 2px, transparent 2px 14px),
+  repeating-linear-gradient(-45deg, rgba(255,255,255,.07) 0 2px, transparent 2px 14px); }

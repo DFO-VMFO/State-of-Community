@@ -1,0 +1,20 @@
+# Free-plan backup: runs weekly in GitHub (private repo!), keeps the encrypted file for 90 days.
+# One-time setup: repo Settings > Secrets > Actions > add SUPABASE_DB_URL (session pooler URI) and BACKUP_PASSPHRASE (store it in the password manager).
+name: Weekly backup
+on:
+  schedule: [{ cron: '0 8 * * 0' }, { cron: '0 8 * * 3' }]   # Sunday and Wednesday, 3am Dallas
+  workflow_dispatch:
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pg_dump 17
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc >/dev/null
+          sudo apt-get update -qq && sudo apt-get install -y postgresql-client-17
+      - run: bash scripts/backup.sh backups
+        env: { SUPABASE_DB_URL: '${{ secrets.SUPABASE_DB_URL }}', BACKUP_PASSPHRASE: '${{ secrets.BACKUP_PASSPHRASE }}' }
+      - uses: actions/upload-artifact@v4
+        with: { name: soc-backup, path: backups/soc-*, retention-days: 90 }
