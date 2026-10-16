@@ -30,7 +30,7 @@ export default function Account({ h, refresh, initialCat }: { h: Household; refr
   }
   async function pay(p: Payment) {
     if (supabase) {
-      const { data, error } = await supabase.functions.invoke('create-checkout', { body: { paymentId: p.id, householdId: p.householdId, amount: p.amount, month: p.month } })
+      const { data, error } = await supabase.functions.invoke('soc-create-checkout', { body: { paymentId: p.id } })
       if (error) return setMsg('Payment is not available yet. Please contact us to pay.')
       window.open((data as { url: string }).url, '_blank'); return
     }

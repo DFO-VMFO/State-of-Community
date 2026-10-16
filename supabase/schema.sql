@@ -441,5 +441,11 @@ begin
 end $$;
 revoke execute on function soc_enqueue_reminders() from public, anon, authenticated;
 
--- Schedule it (Database > Extensions: enable pg_cron first). Runs at 14:00 UTC, which is 9:00 in Dallas in winter.
--- select cron.schedule('soc-enqueue', '0 14 * * *', $$ select soc_enqueue_reminders() $$);
+-- Lets the hourly sender prove it is the scheduler without a shared secret in the function settings.
+-- The key lives in Supabase Vault (created by supabase/cron.sql).
+do $do$ begin
+  if exists (select 1 from pg_namespace where nspname = 'vault') then
+    execute $f$ create or replace function soc_cron_key_ok(k text) returns boolean language sql stable security definer set search_path = public, vault as 'select exists (select 1 from vault.decrypted_secrets where name = ''soc_cron_key'' and decrypted_secret = k)' $f$;
+    execute 'revoke execute on function soc_cron_key_ok(text) from public, anon, authenticated';
+  end if;
+end $do$;

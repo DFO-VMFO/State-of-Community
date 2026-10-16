@@ -45,8 +45,8 @@ export default function Broadcasts({ households }: { households: Household[] }) 
     setConfirming(false)
     let simulated = true
     if (supabase) {
-      const { error } = await supabase.functions.invoke('send-broadcast', { body: { channel, subject, body, recipients: to.map(h => ({ name: h.headName, phone: h.phone, email: h.email })) } })
-      if (error) return setStatus(`Not sent: ${error.message}. Deploy the send-broadcast function first (see README).`)
+      const { error } = await supabase.functions.invoke('soc-send-broadcast', { body: { channel, subject, body, recipients: to.map(h => ({ name: h.headName, phone: h.phone, email: h.email })) } })
+      if (error) return setStatus(`Not sent: ${error.message}. Deploy the soc-send-broadcast function first (see README).`)
       simulated = false
     }
     await save({ id: crypto.randomUUID(), sentAt: new Date().toISOString(), channel, audience: audiences.find(a => a[0] === aud)![1], subject, body, recipients: to.length, skipped: group.length - to.length, simulated })

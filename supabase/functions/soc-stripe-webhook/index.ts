@@ -1,5 +1,5 @@
-// Marks a dues invoice paid when Stripe confirms it, and adds the pool share to the ledger. UNTESTED.
-// Secrets: STRIPE_WEBHOOK_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY. Deploy with --no-verify-jwt.
+// Marks a dues invoice paid when Stripe confirms it, and adds the pool share to the ledger.
+// Secrets: STRIPE_WEBHOOK_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY. Deploy with verify_jwt = false (Stripe signs the request instead).
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -7,7 +7,8 @@ async function valid(payload: string, header: string, secret: string) {
   const parts = Object.fromEntries(header.split(',').map(p => p.split('=') as [string, string]))
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
   const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${parts.t}.${payload}`))
-  return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('') === parts.v1
+  const ok = [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('') === parts.v1
+  return ok && Math.abs(Date.now() / 1000 - Number(parts.t)) < 600 // reject replays older than 10 minutes
 }
 
 serve(async req => {

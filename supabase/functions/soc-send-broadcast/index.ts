@@ -1,12 +1,16 @@
-// Sends a broadcast. UNTESTED: deploy, then test with your own number first.
+// Sends a broadcast. Staff only (ops or support). Test with your own number first.
 // Secrets: WHATSAPP_TOKEN, WHATSAPP_PHONE_ID, WHATSAPP_TEMPLATE (an approved template with one {{1}} body variable), RESEND_API_KEY, RESEND_FROM
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
-const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, content-type' }
+const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, x-client-info, content-type' }
 type R = { name: string; phone: string; email: string }
 
 serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
+  const as = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } } })
+  const { data: role } = await as.rpc('soc_staff_role')
+  if (role !== 'ops' && role !== 'support') return new Response(JSON.stringify({ error: 'Staff only' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
   const { channel, subject, body, recipients } = await req.json() as { channel: string; subject: string; body: string; recipients: R[] }
   let failed = 0
   for (const r of recipients) {

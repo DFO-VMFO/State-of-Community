@@ -37,7 +37,7 @@ export default function Dues({ households, refresh }: { households: Household[];
   }
   async function sendLink(p: Payment) {
     if (!supabase) return setNote(`Demo: a Stripe payment link for ${money(p.amount)} would be texted to ${name(p.householdId)}. Use "Simulate card payment" to see the result.`)
-    const { data, error } = await supabase.functions.invoke('create-checkout', { body: { paymentId: p.id, householdId: p.householdId, amount: p.amount, month: p.month } })
+    const { data, error } = await supabase.functions.invoke('soc-create-checkout', { body: { paymentId: p.id } })
     if (error) return setNote(`Could not create a payment link: ${error.message}. Deploy create-checkout first (see README).`)
     window.open((data as { url: string }).url, '_blank')
   }

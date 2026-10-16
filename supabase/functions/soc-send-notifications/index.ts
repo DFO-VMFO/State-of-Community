@@ -1,9 +1,9 @@
-// Delivers the outbox. UNTESTED against live Resend/Meta accounts: deploy, then run it once with your own email and number.
+// Delivers the outbox via Resend (email) and the WhatsApp Cloud API. Test once with your own email and number.
 //
-// Call it on a schedule (Supabase cron / pg_net, hourly) with the header  x-cron-key: <NOTIFY_CRON_KEY>.
+// The hourly pg_cron job calls it with the header x-cron-key, checked against the Vault secret via soc_cron_key_ok().
 // The same function is the WhatsApp webhook: set Meta's callback URL to  <function-url>?hook=whatsapp  (verify token = WHATSAPP_VERIFY_TOKEN).
 //
-// Secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (set by Supabase), NOTIFY_CRON_KEY,
+// Secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (set by Supabase),
 //          RESEND_API_KEY, RESEND_FROM (e.g. "Ugandan Community of DFW <hello@yourdomain.org>"),
 //          WHATSAPP_TOKEN, WHATSAPP_PHONE_ID, WHATSAPP_TEMPLATE (approved template with 2 body variables: {{1}} subject, {{2}} message),
 //          WHATSAPP_VERIFY_TOKEN, optional WHATSAPP_LANG (default en_US).
@@ -30,7 +30,8 @@ serve(async req => {
       if (/^\s*(stop|unsubscribe|cancel|end|quit)\s*$/i.test(m.text?.body ?? '')) await setOptOut(String(m.from))
     return new Response('ok')
   }
-  if (req.headers.get('x-cron-key') !== Deno.env.get('NOTIFY_CRON_KEY')) return new Response('forbidden', { status: 403 })
+  const { data: keyOk } = await db.rpc('soc_cron_key_ok', { k: req.headers.get('x-cron-key') ?? '' })
+  if (keyOk !== true) return new Response('forbidden', { status: 403 })
 
   const { data: queued } = await db.from('soc_records').select('id,data').eq('collection', 'outbox').filter('data->>status', 'eq', 'queued').filter('data->>sendOn', 'lte', today()).limit(200)
   const { data: hhs } = await db.from('soc_households').select('id,data')
