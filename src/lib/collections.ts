@@ -13,7 +13,10 @@ export function useCollection<T extends { id: string }>(name: string, seed: () =
   const reload = useCallback(async () => {
     if (supabase) {
       const { data } = await supabase.from('soc_records').select('data').eq('collection', name)
-      setItems((data ?? []).map(r => r.data as T))
+      const rows = (data ?? []).map(r => r.data as T)
+      // Staff opening the app fills in catalog items that are not in the database yet. Members' attempts are refused by row security and ignored.
+      if (mergeNew) { const have = new Set(rows.map(x => x.id)); const add = seed().filter(x => !have.has(x.id)); if (add.length) { const { error } = await supabase.from('soc_records').upsert(add.map(x => ({ collection: name, id: x.id, data: x }))); if (!error) rows.push(...add) } }
+      setItems(rows)
     } else {
       let v = readLocal<T>(name); if (!v) { v = seed(); writeLocal(name, v) }
       else if (mergeNew) { const have = new Set(v.map(x => x.id)); const add = seed().filter(x => !have.has(x.id)); // A feature that shipped since this browser last loaded: replace its old "vote for it" card with the live one.

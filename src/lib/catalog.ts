@@ -2,7 +2,7 @@ import { pick, rng, seedHouseholds } from './seed'
 import type { Club, EventItem, Goal, GoalKind, Membership, RemitRate, Rsvp, Service, Waitlist } from './types'
 
 export const hueHex = { forest: '#0F3D3A', sun: '#F2B705', crane: '#C8372D', teal: '#1F7A8C', plum: '#6B3F69' } as const
-export const pillars = ['Cross-border', 'Careers', 'Wealth', 'Family', 'Safety net', 'Community']
+export const pillars = ['Cross-border', 'Careers', 'Wealth', 'Health', 'Family', 'Safety net', 'Community']
 
 export const seedServices = (): Service[] => [
   { id: 'bereavement', name: 'Bereavement and repatriation pool', pillar: 'Cross-border', blurb: 'Monthly contributions into a protected pool, so no family has to fundraise to bring a loved one home.', status: 'soon', opens: 'Early 2027', surveyed: true, ticketCategory: 'bereavement', motif: 0 },
@@ -11,6 +11,7 @@ export const seedServices = (): Service[] => [
   { id: 'susu', name: 'Digital susu and community loan pool', pillar: 'Wealth', blurb: 'A modern savings circle that builds U.S. credit and opens the door to low-interest loans.', status: 'interest', surveyed: true, motif: 3 },
   { id: 'incubator', name: 'Business incubator and angel fund', pillar: 'Wealth', blurb: 'Pitch nights, mentors and seed funding for members starting a business here or back home.', status: 'interest', surveyed: true, motif: 4 },
   { id: 'health', name: 'Culturally attuned health and senior care', pillar: 'Family', blurb: 'Therapists, aides and day programs who understand our languages, food and family structure.', status: 'interest', surveyed: true, motif: 5 },
+  { id: 'grocery', name: 'Community grocery co-op', pillar: 'Health', blurb: 'Members pool orders to buy fresh food from local farmers in bulk at lower prices. Everyone who chips in gets their share of the groceries.', status: 'interest', surveyed: false, motif: 2 },
   { id: 'youth', name: 'Youth heritage and immersion fellowships', pillar: 'Family', blurb: 'Language classes, mentors and summer placements back home for college students.', status: 'interest', surveyed: true, motif: 0 },
   { id: 'mutualaid', name: 'Emergency mutual aid fund', pillar: 'Safety net', blurb: 'Fast help when a medical crisis, injury or job loss hits a member household.', status: 'soon', opens: 'Early 2027', surveyed: true, ticketCategory: 'income', motif: 1 },
   { id: 'card', name: 'Digital member card', pillar: 'Community', blurb: 'Your ID for partner discounts and community benefits. Scan it to confirm your membership.', status: 'live', surveyed: false, motif: 2 },

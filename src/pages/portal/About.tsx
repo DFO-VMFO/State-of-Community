@@ -12,6 +12,7 @@ const pillarText: Record<string, string> = {
   'Cross-border': 'Sending money home, immigration dates, repatriation and estates that span two countries.',
   Careers: 'Getting credentials recognized, finding jobs and mentors who have been through the same boards.',
   Wealth: 'Credit, savings circles, a first home and small-business capital.',
+  Health: 'Care that fits our families and good food at fair prices, including a grocery co-op with local farmers.',
   Family: 'Papers in order, care for elders, scholarships and keeping our children connected to home.',
   'Safety net': 'Help that arrives fast when a crisis hits a member household.',
   Community: 'Clubs, events and each other.',
